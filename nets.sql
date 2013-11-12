@@ -16,6 +16,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `cinema_gewara`
+--
+
+DROP TABLE IF EXISTS `cinema_gewara`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cinema_gewara` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `city_en` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `cinema_gewara`
+--
+
+LOCK TABLES `cinema_gewara` WRITE;
+/*!40000 ALTER TABLE `cinema_gewara` DISABLE KEYS */;
+/*!40000 ALTER TABLE `cinema_gewara` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `cinema_mtime`
 --
 
@@ -25,7 +49,6 @@ DROP TABLE IF EXISTS `cinema_mtime`;
 CREATE TABLE `cinema_mtime` (
   `id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
-  `string_id` varchar(255) DEFAULT NULL,
   `city_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
@@ -64,6 +87,30 @@ CREATE TABLE `city` (
 LOCK TABLES `city` WRITE;
 /*!40000 ALTER TABLE `city` DISABLE KEYS */;
 /*!40000 ALTER TABLE `city` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `city_gewara`
+--
+
+DROP TABLE IF EXISTS `city_gewara`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `city_gewara` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `en` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `city_gewara`
+--
+
+LOCK TABLES `city_gewara` WRITE;
+/*!40000 ALTER TABLE `city_gewara` DISABLE KEYS */;
+/*!40000 ALTER TABLE `city_gewara` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -115,6 +162,30 @@ LOCK TABLES `city_mtime` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `movie_gewara`
+--
+
+DROP TABLE IF EXISTS `movie_gewara`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `movie_gewara` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `movie_gewara`
+--
+
+LOCK TABLES `movie_gewara` WRITE;
+/*!40000 ALTER TABLE `movie_gewara` DISABLE KEYS */;
+/*!40000 ALTER TABLE `movie_gewara` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `movie_mtime`
 --
 
@@ -136,6 +207,32 @@ CREATE TABLE `movie_mtime` (
 LOCK TABLES `movie_mtime` WRITE;
 /*!40000 ALTER TABLE `movie_mtime` DISABLE KEYS */;
 /*!40000 ALTER TABLE `movie_mtime` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `showtime_gewara`
+--
+
+DROP TABLE IF EXISTS `showtime_gewara`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `showtime_gewara` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cinema_id` int(11) NOT NULL,
+  `movie_id` int(11) NOT NULL,
+  `date` varchar(255) NOT NULL,
+  `showtime` text NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `showtime_gewara`
+--
+
+LOCK TABLES `showtime_gewara` WRITE;
+/*!40000 ALTER TABLE `showtime_gewara` DISABLE KEYS */;
+/*!40000 ALTER TABLE `showtime_gewara` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -173,4 +270,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-11 16:14:06
+-- Dump completed on 2013-11-12 15:07:48
