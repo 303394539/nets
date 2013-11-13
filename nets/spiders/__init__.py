@@ -23,6 +23,9 @@ class MyBaseSpider(BaseSpider):
         self.sCity_gewara = 'select id,`name`,en from city_gewara'
         self.iCinema_gewara = 'insert into cinema_gewara(id,`name`,city_en)values(%s,%s,%s)'
         self.sCinema_gewara = 'select id,`name`,city_en from cinema_gewara'
+        self.sMovie_gewara = 'select id,`name`,url from movie_gewara'
+        self.iMovie_gewara = 'insert into movie_gewara(id,`name`,url)values(%s,%s,%s)'
+        self.iShowtime_gewara = 'insert into showtime_gewara(cinema_id,movie_id,`date`,showtime)values(%s,%s,%s,%s)'
         self.truncateSQLs = {
             'showtime_time':'truncate table showtime_mtime'
         }

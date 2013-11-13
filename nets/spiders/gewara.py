@@ -8,15 +8,37 @@ class ShowtimeSpider(MyBaseSpider):#{{{
     allowed_domains = ['gewara.com']
     download_delay = 3
     download_timeout = 15
-    name = 'gewara.showtime'
+    name = 'gewara.showtime' 
     base = 'http://www.gewara.com/cinema/ajax/getCinemaPlayItem.xhtml?cid={0}&fyrq={1}'
 
     def start_requests(self):#{{{
-        pass
+        self.cur.execute(self.sCinema_gewara)
+        for row in self.cur.fetchall():
+            req = Request(self.base.format(row[0],self.date),callback=self.parsePage)
+            req.meta['cinema_id']=row[0]
+            yield req
     #}}}
         
     def parsePage(self,response):#{{{
-        pass
+        self.cur.execute(self.sMovie_gewara)
+        movie_ids = [row[0] for row in self.cur.fetchall()]
+        cinema_id = response.meta['cinema_id']
+        hxs = HtmlXPathSelector(response.replace(body=response.body))
+        data = hxs.select('//div[@class="ticket_choose_box"]/div')
+        movies = []
+        showtimes = []
+        for movie in data[1:]:
+            url = movie.select('./div[@class="chooseOpi_movie"]/div[@class="choseMovieInfo"]/div[@class="ui_media"]/div[@class="ui_pic"]/a/@href').extract()[0]
+            id = int(url.split('/')[2])
+            name = movie.select('./div[@class="chooseOpi_movie"]/div[@class="choseMovieInfo"]/div[@class="ui_media"]/div[@class="ui_pic"]/a/@title').extract()[0]
+            if id not in movie_ids:movies.append([id,name,'http://www.gewara.com'+url])
+            ss = movie.select('./div[2]/div[@class="chooseOpi_body"]/ul/li/span[@class="opitime"]/b')
+            showtime = []
+            for s in ss:
+                showtime.append([s.select('./text()').extract()[0]])
+            showtimes.append([cinema_id,id,self.date,json.dumps(showtime)])
+        self.cur.executemany(self.iMovie_gewara,movies)
+        self.cur.executemany(self.iShowtime_gewara,showtimes)
         #}}}
 #}}}
 
