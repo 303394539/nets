@@ -4,11 +4,12 @@ from scrapy.selector import HtmlXPathSelector
 from nets.spiders import MyBaseSpider
 import json
 import subprocess
+import Image
 
 class MovieSpider(MyBaseSpider):#{{{
     allowed_domains = ['douban.com']
-    download_delay = 3
-    download_timeout = 20
+    download_delay = 2
+    download_timeout = 30
     name = 'douban.movie'
     base = 'http://movie.douban.com/subject_search?search_text={0}'
 
@@ -42,7 +43,7 @@ class MovieSpider(MyBaseSpider):#{{{
             if movie:
                 href = movie.select('./@href').extract()[0]
                 req = Request(href,callback=self.parsePage)
-                req.meta['id'] = href.split('/')[4]
+                req.meta['id'] = int(href.split('/')[4])
                 req.meta['source'] = source
                 req.meta['pid'] = pid
                 req.meta['view'] = u'movie'
@@ -50,78 +51,102 @@ class MovieSpider(MyBaseSpider):#{{{
         elif view == 'movie':
             id = response.meta['id']
             hxs = HtmlXPathSelector(response.replace(body=response.body))
-            namespan = hxs.select('//div[@id="content"]/h1/span[1]')
-            if namespan:name = namespan.select('./text()').extract()[0].split(' ')[0]#电影名称
             movie = hxs.select('//div[@class="article"]')
-            grade = movie.select('./div/div/div[2]/div/p/strong/text()').extract()[0]#评分
-            spans = movie.select('./div/div/div/div[2]/span')
-            directors = []#导演
-            actors = []#演员
-            types = []#类型
-            releases = []#首映时间
-            duration = 90
-            for span in spans:
-                s = span.select('./span[@class="pl"]')
-                if s:
-                    peoples = span.select('./a')
-                    for p in peoples:
-                        text = p.select('./text()').extract()[0]
-                        href = p.select('./@href').extract()
-                        if href:
-                            if 'celebrity' in href[0]:
-                                if p.select('./@rel'):
-                                    directors.append(text)
-                                else:
-                                    actors.append(text)
+            self.cur.execute(self.sMovie_douban)
+            movielist = self.cur.fetchall()
+            replaces = {}
+            ids = [row[0] for row in movielist]
+            for row in movielist:
+                replaces[row[0]] = row[3]
+            if id in ids:
+                if replaces.get(id):
+                    self.cur.execute(self.dMovie_douban,(source,pid))
+                    urllist = response.url.split('/')
+                    req = Request('/'.join(urllist[:-2])+'/'+str(replaces.get(id))+'/',callback=self.parsePage)
+                    req.meta['id'] = replaces.get(id)
+                    req.meta['source'] = source
+                    req.meta['pid'] = pid
+                    req.meta['view'] = u'movie'
+                    yield req
                 else:
-                    property = span.select('./@property')
-                    if property:
-                        text = property.extract()[0]
-                        if 'genre' in text:
-                            types.append(span.select('./text()').extract()[0])
-                        elif 'initialReleaseDate' in text:
-                            releases.append(span.select('./text()').extract()[0].split('(')[0])
-                        elif 'runtime' in text:
-                            duration = span.select('./@content').extract()[0]
-            detail = ''
-            detailspan = movie.select('./div/div/span[@property="v:summary"]')
-            if detailspan:detail = detailspan.select('./text()').extract()[0]
+                    grade = '6'
+                    gradestrong = movie.select('./div/div/div[2]/div/p/strong/text()')
+                    if gradestrong:grade = gradestrong.extract()[0]#评分
+                    self.cur.execute(self.uMovie_douban,(grade))
             else:
-                detailspan = movie.select('./div/div/span/span[@property="v:summary"]')
-                if detailspan:detail = detailspan.select('./text()').extract()[0].strip()#简介
-            director = ''
-            if directors:
-                for d in directors[:-1]:
-                    director += d+'/'
-                director += directors[-1]
-            actor = ''
-            if actors:
-                for a in actors[:-1]:
-                    actor += a+'/'
-                actor += actors[-1]
-            type = ''
-            if types:
-                for t in types[:-1]:
-                    type += t+'/'
-                type += types[-1]
-            release = 0
-            if releases:release=releases[0]
-            self.cur.execute(self.iMovie_douban,(id,name,director,actor,release,duration,source,pid,detail,type,grade))
-            image = movie.select('./div/div/div/div/a[@class="nbgnbg"]/@href').extract()[0]
-            if 'lpic' in image:
-                req = Request(image,callback=self.parsePage)
-                req.meta['source'] = source
-                req.meta['pid'] = pid
-                req.meta['view'] = u'image'
-                req.meta['id'] = id
-                yield req
-            else:
-                req = Request(image,callback=self.parsePage)
-                req.meta['source'] = source
-                req.meta['pid'] = pid
-                req.meta['view'] = u'images'
-                req.meta['id'] = id
-                yield req
+                namespan = hxs.select('//div[@id="content"]/h1/span[1]')
+                if namespan:name = namespan.select('./text()').extract()[0].split(' ')[0]#电影名称
+                grade = '6'
+                gradestrong = movie.select('./div/div/div[2]/div/p/strong/text()')
+                if gradestrong:grade = gradestrong.extract()[0]#评分
+                spans = movie.select('./div/div/div/div[2]/span')
+                directors = []#导演
+                actors = []#演员
+                types = []#类型
+                releases = []#首映时间
+                duration = 90
+                for span in spans:
+                    s = span.select('./span[@class="pl"]')
+                    if s:
+                        peoples = span.select('./a')
+                        for p in peoples:
+                            text = p.select('./text()').extract()[0]
+                            href = p.select('./@href').extract()
+                            if href:
+                                if 'celebrity' in href[0]:
+                                    if p.select('./@rel'):
+                                        directors.append(text)
+                                    else:
+                                        actors.append(text)
+                    else:
+                        property = span.select('./@property')
+                        if property:
+                            text = property.extract()[0]
+                            if 'genre' in text:
+                                types.append(span.select('./text()').extract()[0])
+                            elif 'initialReleaseDate' in text:
+                                releases.append(span.select('./text()').extract()[0].split('(')[0])
+                            elif 'runtime' in text:
+                                duration = span.select('./@content').extract()[0]
+                detail = ''
+                detailspan = movie.select('./div/div/span[@property="v:summary"]')
+                if detailspan:detail = detailspan.select('./text()').extract()[0]
+                else:
+                    detailspan = movie.select('./div/div/span/span[@property="v:summary"]')
+                    if detailspan:detail = detailspan.select('./text()').extract()[0].strip()#简介
+                director = ''
+                if directors:
+                    for d in directors[:-1]:
+                        director += d+'/'
+                    director += directors[-1]
+                actor = ''
+                if actors:
+                    for a in actors[:-1]:
+                        actor += a+'/'
+                    actor += actors[-1]
+                type = ''
+                if types:
+                    for t in types[:-1]:
+                        type += t+'/'
+                    type += types[-1]
+                release = 0
+                if releases:release=releases[0]
+                self.cur.execute(self.iMovie_douban,(id,name,director,actor,release,duration,source,pid,detail,type,grade))
+                image = movie.select('./div/div/div/div/a[@class="nbgnbg"]/@href').extract()[0]
+                if 'lpic' in image:
+                    req = Request(image,callback=self.parsePage)
+                    req.meta['source'] = source
+                    req.meta['pid'] = pid
+                    req.meta['view'] = u'image'
+                    req.meta['id'] = id
+                    yield req
+                else:
+                    req = Request(image,callback=self.parsePage)
+                    req.meta['source'] = source
+                    req.meta['pid'] = pid
+                    req.meta['view'] = u'images'
+                    req.meta['id'] = id
+                    yield req
         elif view == 'images':
             id = response.meta['id']
             hxs = HtmlXPathSelector(response.replace(body=response.body))
@@ -170,6 +195,9 @@ class MovieSpider(MyBaseSpider):#{{{
             yield req
         elif view == 'image':
             id = response.meta['id']
-            open('/home/baic/poster/'+id+'.jpg','wb').write(response.body)
+            name = str(id)+'.jpg'
+            open(self.path_image_src+name,'wb').write(response.body)
+            img = Image.open(self.path_image_src+name)
+            img.resize(self.image_size,Image.ANTIALIAS).save(self.path_image_rel+name,'JPEG')
         #}}}
 #}}}
