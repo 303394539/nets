@@ -11,31 +11,45 @@ class MovieSpider(MyBaseSpider):#{{{
     download_delay = 2
     download_timeout = 30
     name = 'douban.movie'
-    base = 'http://movie.douban.com/subject_search?search_text={0}'
 
     def start_requests(self):#{{{
+        self.cur.execute(self.sMmovie_matcher)
+        mmovie_matcher = self.cur.fetchall()
+        douban_ids_matcher = [row[0] for row in mmovie_matcher]
+        mmovie_ids = [row[1] for row in mmovie_matcher]
+        self.cur.execute(self.sGmovie_matcher)
+        gmovie_matcher = self.cur.fetchall()
+        douban_ids_matcher += [row[0] for row in gmovie_matcher]
+        gmovie_ids = [row[1] for row in gmovie_matcher]
+        douban_ids_matcher = list(set(douban_ids_matcher))
+        self.cur.execute(self.sMovie)
+        douban_ids = [row[0] for row in self.cur.fetchall()]
+        for douban_id in douban_ids_matcher:
+            if douban_id not in douban_ids:
+                req = Request(self.douban_movie_url.format(douban_id),callback=self.parseMovie)
+                yield req
+        self.cur.execute(self.sMovie_mtime)
+        for row in self.cur.fetchall():
+            if row[0] not in mmovie_ids:
+                req = Request(self.douban_search_url.format(row[1].encode('utf-8')),callback=self.parseSearch)
+                req.meta['search'] = row[1]
+                yield req
+        self.cur.execute(self.sMovie_gewara)
+        for row in self.cur.fetchall():
+            if row[0] not in gmovie_ids:
+                req = Request(self.douban_search_url.format(row[1].encode('utf-8')),callback=self.parseSearch)
+                req.meta['search'] = row[1]
+                yield req
     #}}}
 
     def parseSearch(self,response):#{{{
-        matcher = response.meta['matcher']
+        search = response.meta['search']
         hxs = HtmlXPathSelector(response.replace(body=response.body))
         movie = hxs.select('//table[1]/tr/td[2]/div/a')
         if movie:
             href = movie.select('./@href').extract()[0]
             douban_id = int(href.split('/')[4])
-            self.cur.execute(self.sMovie_matcher)
-            rows = self.cur.fetchall()
-            mjson = {}
-            for row in rows:
-                mjson[row[0]]={'mtime':row[1],'gewara':row[2]}
-            if douban_id in mjson.keys():
-               mjson.get(douban_id)[source] = pid
-               self.cur.execute(self.uMovie_matcher,(mjson.get(douban_id).get('mtime'),mjson.get(douban_id).get('gewara'),douban_id))
-            req = Request(href,callback=self.parseMovie)
-            req.meta['douban_id'] = douban_id
-            req.meta['source'] = source
-            req.meta['pid'] = pid
-            yield req
+            print search
     #}}}
     
     def parseMovie(self,response):#{{{

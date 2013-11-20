@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.1.69, for redhat-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.6.12, for osx10.7 (x86_64)
 --
 -- Host: localhost    Database: nets
 -- ------------------------------------------------------
--- Server version	5.1.69
+-- Server version	5.6.12
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -152,6 +152,45 @@ CREATE TABLE `city_mtime` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `douban_cache`
+--
+
+DROP TABLE IF EXISTS `douban_cache`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `douban_cache` (
+  `iddouban_cache` int(11) NOT NULL,
+  `search` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `gmovie_matcher`
+--
+
+DROP TABLE IF EXISTS `gmovie_matcher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `gmovie_matcher` (
+  `douban_id` int(11) NOT NULL,
+  `gmovie_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `mmovie_matcher`
+--
+
+DROP TABLE IF EXISTS `mmovie_matcher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mmovie_matcher` (
+  `douban_id` int(11) NOT NULL,
+  `mmovie_id` int(11) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `movie`
 --
 
@@ -185,21 +224,6 @@ CREATE TABLE `movie_gewara` (
   `name` varchar(255) NOT NULL,
   `url` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `movie_matcher`
---
-
-DROP TABLE IF EXISTS `movie_matcher`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `movie_matcher` (
-  `douban_id` int(11) NOT NULL,
-  `mmovie_id` int(11) NOT NULL,
-  `gmovie_id` int(11) NOT NULL,
-  `new_id` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -261,4 +285,4 @@ CREATE TABLE `showtime_mtime` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-20 17:29:00
+-- Dump completed on 2013-11-20 23:16:14

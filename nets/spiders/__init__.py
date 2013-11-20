@@ -28,6 +28,8 @@ class MyBaseSpider(BaseSpider):
         log.start(WAR,loglevel=log.WARNING)
         '''
         self.date = time.strftime('%Y-%m-%d',time.localtime(time.time()))
+        self.douban_movie_url = 'http://movie.douban.com/subject/{0}/'
+        self.douban_search_url = 'http://movie.douban.com/subject_search?search_text={0}'
         self.iCity_mtime = 'insert into city_mtime(id,`name`,en)values(%s,%s,%s)'
         self.sCity_mtime = 'select id,`name`,en from city_mtime'
         self.iCinema_mtime = 'insert into cinema_mtime(id,`name`,city_id)values(%s,%s,%s)'
@@ -42,15 +44,14 @@ class MyBaseSpider(BaseSpider):
         self.sMovie_gewara = 'select id,`name`,url from movie_gewara'
         self.iMovie_gewara = 'insert into movie_gewara(id,`name`,url)values(%s,%s,%s)'
         self.iShowtime_gewara = 'insert into showtime_gewara(cinema_id,movie_id,`date`,showtime)values(%s,%s,%s,%s)'
-        self.sMovie_matcher = ''
-        self.iMovie_matcher = ''
-        self.uMovie_matcher = ''
-        self.dMovie_matcher = ''
+        self.sMmovie_matcher = 'select douban_id,mmovie_id from mmovie_matcher'
+        self.sGmovie_matcher = 'select douban_id,gmovie_id from gmovie_matcher'
         self.iMovie = 'insert into movie(douban_id,`name`,directors,actors,`release`,duration,detail,`types`,grade)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)'
         self.uMovie = ''
-        self.sMovie = ''
+        self.sMovie = 'select douban_id,`name`,directors,actors,`release`,duration,detail,`types`,grade from movie'
         self.truncateSQLs = {
-            'showtime_time':'truncate table showtime_mtime'
+            'showtime_time':'truncate table showtime_mtime',
+			'douban_cache':'truncate table douban_cache'
         }
     #}}}
     def truncate(self,tables=[]):#{{{
