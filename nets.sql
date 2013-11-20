@@ -59,6 +59,22 @@ CREATE TABLE `cinema_gewara` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `cinema_matcher`
+--
+
+DROP TABLE IF EXISTS `cinema_matcher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cinema_matcher` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `cinema_id` int(11) NOT NULL,
+  `mcinema_id` int(11) NOT NULL,
+  `gcinema_id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `cinema_mtime`
 --
 
@@ -136,25 +152,24 @@ CREATE TABLE `city_mtime` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `movie_douban`
+-- Table structure for table `movie`
 --
 
-DROP TABLE IF EXISTS `movie_douban`;
+DROP TABLE IF EXISTS `movie`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `movie_douban` (
-  `id` int(11) NOT NULL,
+CREATE TABLE `movie` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `douban_id` int(11) NOT NULL,
   `name` varchar(255) DEFAULT NULL,
   `directors` text,
   `actors` text,
   `release` varchar(255) DEFAULT NULL,
   `duration` int(11) DEFAULT NULL,
-  `source` varchar(255) NOT NULL,
-  `pid` int(11) NOT NULL,
   `detail` text,
   `types` varchar(255) DEFAULT NULL,
   `grade` varchar(255) DEFAULT NULL,
-  `replace` int(11) DEFAULT NULL
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -170,6 +185,21 @@ CREATE TABLE `movie_gewara` (
   `name` varchar(255) NOT NULL,
   `url` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `movie_matcher`
+--
+
+DROP TABLE IF EXISTS `movie_matcher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `movie_matcher` (
+  `douban_id` int(11) NOT NULL,
+  `mmovie_id` int(11) NOT NULL,
+  `gmovie_id` int(11) NOT NULL,
+  `new_id` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -231,4 +261,4 @@ CREATE TABLE `showtime_mtime` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-20 10:06:44
+-- Dump completed on 2013-11-20 17:29:00
