@@ -16,6 +16,34 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `cinema`
+--
+
+DROP TABLE IF EXISTS `cinema`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cinema` (
+  `id` int(11) NOT NULL DEFAULT '0',
+  `city_id` int(11) NOT NULL,
+  `district` varchar(100) NOT NULL DEFAULT '',
+  `name` varchar(100) NOT NULL,
+  `address` varchar(255) NOT NULL DEFAULT '',
+  `phone` varchar(100) NOT NULL DEFAULT '',
+  `geo` varchar(100) NOT NULL DEFAULT '',
+  `rank` smallint(4) NOT NULL DEFAULT '0',
+  `parking` varchar(255) NOT NULL DEFAULT '',
+  `traffic` varchar(1000) NOT NULL DEFAULT '',
+  `note` varchar(255) NOT NULL DEFAULT '',
+  `detail` text NOT NULL,
+  `tuan` varchar(100) NOT NULL DEFAULT '',
+  `taobao` varchar(200) NOT NULL DEFAULT '',
+  `taobao_pages` smallint(5) NOT NULL DEFAULT '0',
+  `is_close` tinyint(1) NOT NULL DEFAULT '0',
+  `is_dup` int(11) NOT NULL DEFAULT '0'
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `cinema_gewara`
 --
 
@@ -53,12 +81,12 @@ DROP TABLE IF EXISTS `city`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `city` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `province` varchar(255) NOT NULL,
-  `gps` varchar(255) NOT NULL,
-  `en` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
+  `id` int(11) NOT NULL DEFAULT '0',
+  `province` varchar(20) NOT NULL DEFAULT '',
+  `name` varchar(100) NOT NULL,
+  `geo` varchar(50) NOT NULL DEFAULT '',
+  `pinyin` varchar(40) NOT NULL DEFAULT '',
+  `hot` tinyint(1) NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -74,7 +102,7 @@ CREATE TABLE `city_gewara` (
   `name` varchar(255) NOT NULL,
   `en` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=157 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=313 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -174,7 +202,7 @@ CREATE TABLE `showtime_gewara` (
   `date` varchar(255) NOT NULL,
   `showtime` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6884 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=9308 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -191,7 +219,7 @@ CREATE TABLE `showtime_mtime` (
   `date` varchar(255) NOT NULL,
   `showtime` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=2214 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -203,4 +231,4 @@ CREATE TABLE `showtime_mtime` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-19 16:25:14
+-- Dump completed on 2013-11-20 10:06:44
