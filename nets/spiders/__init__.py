@@ -13,6 +13,7 @@ class MyBaseSpider(BaseSpider):
     cur = connect()
 
     def __init__(self):#{{{
+        help(self)
         self.path = os.path.abspath('../')
         self.path_image_src = self.path+'/poster/src/'
         self.path_image_rel = self.path+'/poster/320*480/'
@@ -47,8 +48,9 @@ class MyBaseSpider(BaseSpider):
         self.sMmovie_matcher = 'select douban_id,mmovie_id from mmovie_matcher'
         self.sGmovie_matcher = 'select douban_id,gmovie_id from gmovie_matcher'
         self.iMovie = 'insert into movie(douban_id,`name`,directors,actors,`release`,duration,detail,`types`,grade)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)'
-        self.uMovie = ''
+        self.uMovie = 'update movie set grade=%s where douban_id=%s'
         self.sMovie = 'select douban_id,`name`,directors,actors,`release`,duration,detail,`types`,grade from movie'
+        self.iDouban_cache = 'insert into douban_cache(douban_id,search)values(%s,%s)'
         self.truncateSQLs = {
             'showtime_time':'truncate table showtime_mtime',
 			'douban_cache':'truncate table douban_cache'

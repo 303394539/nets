@@ -24,10 +24,13 @@ class MovieSpider(MyBaseSpider):#{{{
         douban_ids_matcher = list(set(douban_ids_matcher))
         self.cur.execute(self.sMovie)
         douban_ids = [row[0] for row in self.cur.fetchall()]
+        #判断人为修改的新douban_id是否已经爬取，如果没有重启爬取
         for douban_id in douban_ids_matcher:
             if douban_id not in douban_ids:
                 req = Request(self.douban_movie_url.format(douban_id),callback=self.parseMovie)
+                req.meta['douban_id'] = douban_id
                 yield req
+        #判断电影关联是否存在，如果不存在重新爬取
         self.cur.execute(self.sMovie_mtime)
         for row in self.cur.fetchall():
             if row[0] not in mmovie_ids:
@@ -49,37 +52,23 @@ class MovieSpider(MyBaseSpider):#{{{
         if movie:
             href = movie.select('./@href').extract()[0]
             douban_id = int(href.split('/')[4])
-            print search
+            self.cur.execute(self.iDouban_cache,(douban_id,search))
+            req = Request(href,callback=self.parseMovie)
+            req.meta['douban_id'] = douban_id
+            yield req
     #}}}
     
     def parseMovie(self,response):#{{{
         douban_id = response.meta['douban_id']
-        source = response.meta['source']
-        pid = response.meta['pid']
         hxs = HtmlXPathSelector(response.replace(body=response.body))
         movie = hxs.select('//div[@class="article"]')
-        self.cur.execute(self.sMovie_matcher)
-        rows = self.cur.fetchall()
-        douban_ids = [row[0] for row in rows]
-        mjson = {}
-        for row in rows:
-            mjson[row[0]]=row[3]
+        self.cur.execute(self.sMovie)
+        douban_ids = [row[0] for row in self.cur.fetchall()]
         if douban_id in douban_ids:
-            new_id = mjson.get(douban_id)
-            if new_id:
-                mmovie_id = mjson.get(douban_id).get('mtime')
-                gmovie_id = mjson.get(douban_id).get('gewara')
-                urllist = response.url.split('/')
-                req = Request('/'.join(urllist[:-2])+'/'+str(new_id)+'/',callback=self.parseMovie)
-                req.meta['douban_id'] = new_id
-                req.meta['source'] = 'mtime,gewara'
-                req.meta['pid'] = [mmovie_id,gmovie_id]
-                yield req
-            else:
-                grade = '6'
-                gradestrong = movie.select('./div/div/div[2]/div/p/strong/text()')
-                if gradestrong:grade = gradestrong.extract()[0]#评分
-                self.cur.execute(self.uMovie,(grade,douban_id))
+            grade = '6'
+            gradestrong = movie.select('./div/div/div[2]/div/p/strong/text()')
+            if gradestrong:grade = gradestrong.extract()[0]#评分
+            self.cur.execute(self.uMovie,(grade,douban_id))
         else:
             namespan = hxs.select('//div[@id="content"]/h1/span[1]')
             if namespan:name = namespan.select('./text()').extract()[0].split(' ')[0]#电影名称
@@ -139,11 +128,6 @@ class MovieSpider(MyBaseSpider):#{{{
             release = 0
             if releases:release=releases[0]
             self.cur.execute(self.iMovie,(douban_id,name,director,actor,release,duration,detail,type,grade))
-            if source:
-                if source == 'mtime':matcher = (douban_id,pid,0,0)
-                elif source == 'gewara':matcher = (douban_id,0,pid,0)
-                elif source == 'mtime,gewara':matcher = (douban_id,pid[0],pid[1],0)
-                self.cur.execute(self.iMovie_matcher,matcher)
             image = movie.select('./div/div/div/div/a[@class="nbgnbg"]/@href').extract()[0]
             if 'lpic' in image:
                 req = Request(image,callback=self.parseImage)
